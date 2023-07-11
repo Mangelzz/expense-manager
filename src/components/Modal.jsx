@@ -1,12 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import close from "../img/cerrar.svg";
 import Error from "./Error";
 
-const Modal = ({ setModal, animateModal, setAnimateModal, saveExpense }) => {
+const Modal = ({
+  setModal,
+  animateModal,
+  setAnimateModal,
+  saveExpense,
+  editExpenses,
+  setEditExpenses,
+}) => {
   const [message, setMessage] = useState("");
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState(0);
+  const [date, setDate] = useState("");
   const [category, setCategory] = useState("");
+
+  const [id, setId] = useState("");
+
+  useEffect(() => {
+    if (Object.keys(editExpenses).length > 0) {
+      setName(editExpenses.name);
+      setQuantity(editExpenses.quantity);
+      setCategory(editExpenses.category);
+      setId(editExpenses.id);
+      setDate(editExpenses.date);
+    }
+  }, []);
 
   const closeModal = () => {
     setTimeout(() => {
@@ -14,6 +34,7 @@ const Modal = ({ setModal, animateModal, setAnimateModal, saveExpense }) => {
     }, 500);
 
     setAnimateModal(false);
+    setEditExpenses({})
   };
 
   const handleSubmit = (e) => {
@@ -26,7 +47,7 @@ const Modal = ({ setModal, animateModal, setAnimateModal, saveExpense }) => {
       }, 2000);
       return;
     }
-    saveExpense({ name, quantity, category });
+    saveExpense({ name, quantity, category, id, date });
   };
 
   return (
@@ -38,7 +59,7 @@ const Modal = ({ setModal, animateModal, setAnimateModal, saveExpense }) => {
         onSubmit={handleSubmit}
         className={`formulario ${animateModal ? "animar" : "cerrar"}`}
       >
-        <legend>New budget</legend>
+        <legend>{editExpenses.name ? "Edit expense" : "New expense"}</legend>
         {message && <Error type="error">{message}</Error>}
         <div className="campo">
           <label htmlFor="concept">Concept</label>
@@ -80,7 +101,10 @@ const Modal = ({ setModal, animateModal, setAnimateModal, saveExpense }) => {
           </select>
         </div>
 
-        <input type="submit" value="new budget" />
+        <input
+          type="submit"
+          value={editExpenses.name ? "Save changes" : "Add expense"}
+        />
       </form>
     </div>
   );
